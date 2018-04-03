@@ -6,12 +6,13 @@ before_install:
 android:
   components:
     - android-27
+    - android-26
     - build-tools-27.0.3
     - extra
-    - addon
-    - sys-img-armeabi-v7a-android-27
+    - add-on
+    - sys-img-x86-google_apis_playstore-26
 before_script:
-  - echo no | android create avd --force -n testEmulator -t android-27 --abi armeabi-v7a
+  - echo no | android create avd --force -n testEmulator -t android-26 --abi armeabi-v7a
   - emulator -avd testEmulator -no-skin -no-audio -no-window &
   - android-wait-for-emulator
 script:
