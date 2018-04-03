@@ -22,7 +22,7 @@ That's all folks pretty simple
 Gradle dependency:
 ---
 ```groovy
-implementation 'com.github.leonardoxh:keystore-ultimate:1.0.0'
+implementation 'com.github.leonardoxh:keystore-ultimate:1.0.1'
 ```
 
 LICENSE:
