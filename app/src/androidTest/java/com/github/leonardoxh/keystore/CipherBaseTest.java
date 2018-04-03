@@ -40,6 +40,7 @@ abstract class CipherBaseTest {
         subject.removeKey(ALIAS_FOR_TEST);
 
         assertThat(subject.containsAlias(ALIAS_FOR_TEST)).isFalse();
+        assertThat(subject.decrypt(ALIAS_FOR_TEST)).isNull();
     }
 
     @Test
@@ -54,13 +55,6 @@ abstract class CipherBaseTest {
         String valueToStore = "other-alias";
         subject.saveOrReplace(ALIAS_FOR_TEST, valueToStore);
         assertThat(subject.decrypt(ALIAS_FOR_TEST)).isEqualTo(valueToStore);
-    }
-
-    @Test
-    public void itReturnNullWithoutAnyKey() {
-        subject.removeKey(ALIAS_FOR_TEST);
-
-        assertThat(subject.decrypt(ALIAS_FOR_TEST)).isNull();
     }
 
     abstract CipherStorage init();
