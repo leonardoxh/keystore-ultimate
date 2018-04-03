@@ -15,4 +15,4 @@ before_script:
   - emulator -avd testEmulator -no-skin -no-audio -no-window &
   - android-wait-for-emulator
 script:
-  - ./gradlew test
+  - ./gradlew connectedAndroidTest
