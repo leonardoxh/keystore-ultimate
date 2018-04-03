@@ -56,5 +56,12 @@ abstract class CipherBaseTest {
         assertThat(subject.decrypt(ALIAS_FOR_TEST)).isEqualTo(valueToStore);
     }
 
+    @Test
+    public void itReturnNullWithoutAnyKey() {
+        subject.removeKey(ALIAS_FOR_TEST);
+
+        assertThat(subject.decrypt(ALIAS_FOR_TEST)).isNull();
+    }
+
     abstract CipherStorage init();
 }

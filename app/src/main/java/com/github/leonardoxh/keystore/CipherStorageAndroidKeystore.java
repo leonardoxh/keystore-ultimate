@@ -122,6 +122,7 @@ public class CipherStorageAndroidKeystore implements CipherStorage {
             KeyStore keyStore = getKeyStoreAndLoad();
             if (keyStore.containsAlias(alias)) {
                 keyStore.deleteEntry(alias);
+                CipherPreferencesStorage.remove(context, alias);
             }
         } catch (KeyStoreException e) {
             throw new KeyStoreAccessException("Failed to access Keystore", e);
