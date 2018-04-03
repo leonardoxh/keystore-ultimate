@@ -19,7 +19,7 @@ CipherStorage cipherStorage = CipherStorageFactory.newInstance(context);
 
 That's all folks pretty simple
 
-Dependencie:
+Gradle dependency:
 ---
 ```groovy
 implementation 'com.github.leonardoxh:keystore-ultimate:1.0.0'
