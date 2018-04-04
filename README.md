@@ -15,15 +15,18 @@ CipherStorage cipherStorage = new CipherStorageAndroidKeystore(context);
 CipherStorage cipherStorage = new CipherStorageSharedPreferencesKeystore(context);
 //if you want the correct implementation you can always use the CipherStorageFactory
 CipherStorage cipherStorage = CipherStorageFactory.newInstance(context);
+//Then you can use the encrypt and decrypt method
 ```
-
-That's all folks pretty simple
 
 Gradle dependency:
 ---
 ```groovy
 implementation 'com.github.leonardoxh:keystore-ultimate:1.0.1'
 ```
+
+Inspiration:
+---
+* [React native keychain](https://github.com/oblador/react-native-keychain)
 
 LICENSE:
 ---
