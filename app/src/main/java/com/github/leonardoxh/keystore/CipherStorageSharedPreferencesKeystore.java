@@ -17,7 +17,6 @@ package com.github.leonardoxh.keystore;
 
 import android.content.Context;
 import android.security.KeyPairGeneratorSpec;
-import android.util.Base64;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -47,18 +46,18 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import javax.security.auth.x500.X500Principal;
 
-public class CipherStorageSharedPreferencesKeystore implements CipherStorage {
+class CipherStorageSharedPreferencesKeystore implements CipherStorage {
     private static final String ANDROID_KEY_STORE = "AndroidKeyStore";
     private static final String KEY_ALGORITHM_RSA = "RSA";
     private static final String KEY_ALGORITHM_AES = "AES";
     private static final String TRANSFORMATION = "RSA/ECB/PKCS1Padding";
-    private static final int ENCRYPTION_KEY_SIZE = 128;
+    private static final int ENCRYPTION_KEY_SIZE = 256;
     private static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
     private static final BigInteger KEY_SERIAL_NUMBER = BigInteger.valueOf(1338);
 
     private final Context context;
 
-    public CipherStorageSharedPreferencesKeystore(Context context) {
+    CipherStorageSharedPreferencesKeystore(Context context) {
         this.context = context;
     }
 
@@ -70,9 +69,9 @@ public class CipherStorageSharedPreferencesKeystore implements CipherStorage {
         }
 
         KeyStore.PrivateKeyEntry key = (KeyStore.PrivateKeyEntry) entry;
-        String encryptedData = encryptData(alias, value, key.getCertificate().getPublicKey());
+        byte[] encryptedData = encryptData(alias, value, key.getCertificate().getPublicKey());
 
-        CipherPreferencesStorage.saveKeyString(context, alias, encryptedData);
+        CipherPreferencesStorage.saveKeyBytes(context, alias, encryptedData);
     }
 
     @Nullable
@@ -106,15 +105,13 @@ public class CipherStorageSharedPreferencesKeystore implements CipherStorage {
 
     @Nullable
     private String decryptData(String alias, PrivateKey privateKey) {
-        String encryptedData = CipherPreferencesStorage.getKeyString(context, alias);
-        String secretData = CipherPreferencesStorage.getKeyString(context, "aes!"+alias);
+        byte[] encryptedData = CipherPreferencesStorage.getKeyBytes(context, alias);
+        byte[] secretData = CipherPreferencesStorage.getKeyBytes(context, "aes!"+alias);
         if (encryptedData == null || secretData == null) {
             return null;
         }
-        byte[] decodedData = Base64.decode(encryptedData, Base64.DEFAULT);
-        byte[] decryptedData = decryptRsa(decodedData, privateKey);
-        byte[] decodedSecret = Base64.decode(secretData, Base64.DEFAULT);
-        SecretKeySpec secretKey = new SecretKeySpec(decodedSecret, 0, decodedSecret.length, KEY_ALGORITHM_AES);
+        byte[] decryptedData = decryptRsa(encryptedData, privateKey);
+        SecretKeySpec secretKey = new SecretKeySpec(secretData, 0, secretData.length, KEY_ALGORITHM_AES);
         byte[] finalData = decryptAes(decryptedData, secretKey);
         return new String(finalData, DEFAULT_CHARSET);
     }
@@ -146,7 +143,7 @@ public class CipherStorageSharedPreferencesKeystore implements CipherStorage {
             KeyGenerator generator = KeyGenerator.getInstance(KEY_ALGORITHM_AES);
             generator.init(ENCRYPTION_KEY_SIZE);
             SecretKey secret = generator.generateKey();
-            CipherPreferencesStorage.saveKeyString(context, "aes!"+alias, Base64.encodeToString(secret.getEncoded(), Base64.DEFAULT));
+            CipherPreferencesStorage.saveKeyBytes(context, "aes!"+alias, secret.getEncoded());
             return secret;
         } catch (NoSuchAlgorithmException e) {
             throw new CryptoFailedException("Unable to generate key for alias " + alias, e);
@@ -197,11 +194,10 @@ public class CipherStorageSharedPreferencesKeystore implements CipherStorage {
         }
     }
 
-    private String encryptData(String alias, String value, PublicKey publicKey) {
+    private byte[] encryptData(String alias, String value, PublicKey publicKey) {
         byte[] data = value.getBytes(DEFAULT_CHARSET);
         byte[] aesData = encryptAes(data, alias);
-        byte[] encryptedInput = encryptRsa(aesData, publicKey);
-        return Base64.encodeToString(encryptedInput, Base64.DEFAULT);
+        return encryptRsa(aesData, publicKey);
     }
 
     private byte[] encryptAes(byte[] inputByteArray, String alias) {

@@ -27,7 +27,7 @@ final class CipherPreferencesStorage {
         throw new AssertionError();
     }
 
-    static void saveKeyString(Context context, String alias, String value) {
+    private static void saveKeyString(Context context, String alias, String value) {
         context.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE)
                 .edit()
                 .putString(alias, value)
@@ -47,7 +47,7 @@ final class CipherPreferencesStorage {
     }
 
     @Nullable
-    static String getKeyString(Context context, String alias) {
+    private static String getKeyString(Context context, String alias) {
         return context.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE)
                 .getString(alias, null);
     }
