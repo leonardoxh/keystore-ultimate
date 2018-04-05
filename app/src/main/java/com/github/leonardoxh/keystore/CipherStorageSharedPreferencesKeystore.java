@@ -54,7 +54,7 @@ class CipherStorageSharedPreferencesKeystore implements CipherStorage {
     private static final String KEY_ALGORITHM_RSA = "RSA";
     private static final String KEY_ALGORITHM_AES = "AES";
     private static final String TRANSFORMATION = "RSA/ECB/PKCS1Padding";
-    private static final int ENCRYPTION_KEY_SIZE = 256;
+    private static final int ENCRYPTION_KEY_SIZE = 128;
     private static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
     private static final BigInteger KEY_SERIAL_NUMBER = BigInteger.valueOf(1338);
 
@@ -197,7 +197,7 @@ class CipherStorageSharedPreferencesKeystore implements CipherStorage {
             return cipherAes.doFinal(value.getBytes(DEFAULT_CHARSET));
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException
                 | BadPaddingException | IllegalBlockSizeException e) {
-            throw new CryptoFailedException("Unable to encrypt key aes for alias " + alias);
+            throw new CryptoFailedException("Unable to encrypt key aes for alias " + alias, e);
         }
     }
 
@@ -220,7 +220,7 @@ class CipherStorageSharedPreferencesKeystore implements CipherStorage {
             return cipher.doFinal(inputByteArray);
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException
                 | BadPaddingException | IllegalBlockSizeException e) {
-            throw new CryptoFailedException("Unable to encrypt RSA");
+            throw new CryptoFailedException("Unable to encrypt RSA", e);
         }
     }
 }
