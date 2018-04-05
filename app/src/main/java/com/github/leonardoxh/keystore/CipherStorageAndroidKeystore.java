@@ -45,7 +45,6 @@ import javax.crypto.spec.IvParameterSpec;
 
 @TargetApi(Build.VERSION_CODES.M)
 final class CipherStorageAndroidKeystore extends BaseCipherStorage {
-    private static final String KEYSTORE_TYPE = "AndroidKeyStore";
     private static final String ENCRYPTION_ALGORITHM = KeyProperties.KEY_ALGORITHM_AES;
     private static final String ENCRYPTION_BLOCK_MODE = KeyProperties.BLOCK_MODE_CBC;
     private static final String ENCRYPTION_PADDING = KeyProperties.ENCRYPTION_PADDING_PKCS7;
@@ -65,7 +64,7 @@ final class CipherStorageAndroidKeystore extends BaseCipherStorage {
         try {
             KeyStore keyStore = getKeyStoreAndLoad();
 
-            KeyGenerator generator = KeyGenerator.getInstance(ENCRYPTION_ALGORITHM, KEYSTORE_TYPE);
+            KeyGenerator generator = KeyGenerator.getInstance(ENCRYPTION_ALGORITHM, ANDROID_KEY_STORE);
             generator.init(generateParameterSpec(alias));
             generator.generateKey();
 
