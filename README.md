@@ -9,7 +9,7 @@ it automatically deals with old Android keystore implementation (pre api 23) and
 Usage:
 ---
 ```java
-//Just get a instance of the CipherStorage and thats it
+//Just get a instance of the CipherStorage
 CipherStorage cipherStorage = CipherStorageFactory.newInstance(context);
 //Then you can use the encrypt and decrypt method
 ```
@@ -17,12 +17,17 @@ CipherStorage cipherStorage = CipherStorageFactory.newInstance(context);
 Gradle dependency:
 ---
 ```groovy
-implementation 'com.github.leonardoxh:keystore-ultimate:1.0.1'
+implementation 'com.github.leonardoxh:keystore-ultimate:1.1.0'
 ```
 
 Inspiration:
 ---
 * [React native keychain](https://github.com/oblador/react-native-keychain)
+
+Limitations:
+---
+* On Api level 22 and bellow your key should not contain more than 256 bytes otherwise we can't save
+the the value due a limitation on the Android Keystore
 
 LICENSE:
 ---
