@@ -161,7 +161,8 @@ class CipherStorageAndroidKeystore implements CipherStorage {
                 output.write(buffer, 0, n);
             }
             return new String(output.toByteArray(), DEFAULT_CHARSET);
-        } catch (Exception e) {
+        } catch (IOException | NoSuchAlgorithmException | NoSuchPaddingException |
+                InvalidKeyException | InvalidAlgorithmParameterException e) {
             throw new CryptoFailedException("Could not decrypt bytes", e);
         }
     }
