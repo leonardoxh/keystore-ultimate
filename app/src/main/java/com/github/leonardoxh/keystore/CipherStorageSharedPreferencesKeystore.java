@@ -53,6 +53,7 @@ class CipherStorageSharedPreferencesKeystore extends BaseCipherStorage {
     private static final String TRANSFORMATION = "RSA/ECB/PKCS1Padding";
     private static final int ENCRYPTION_KEY_SIZE = 128;
     private static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
+    private static final String AES_TAG_PREFIX = "aes!";
     private static final BigInteger KEY_SERIAL_NUMBER = BigInteger.valueOf(1338);
 
     CipherStorageSharedPreferencesKeystore(Context context) {
@@ -84,15 +85,21 @@ class CipherStorageSharedPreferencesKeystore extends BaseCipherStorage {
     }
 
     @Override
+    public boolean containsAlias(String alias) {
+        return super.containsAlias(alias)
+                && CipherPreferencesStorage.containsAlias(context, makeAesTagForAlias(alias));
+    }
+
+    @Override
     public void removeKey(String alias) {
         super.removeKey(alias);
-        CipherPreferencesStorage.remove(context, "aes!" + alias);
+        CipherPreferencesStorage.remove(context, makeAesTagForAlias(alias));
     }
 
     @Nullable
     private String decryptData(String alias, PrivateKey privateKey) {
         byte[] encryptedData = CipherPreferencesStorage.getKeyBytes(context, alias);
-        byte[] secretData = CipherPreferencesStorage.getKeyBytes(context, "aes!"+alias);
+        byte[] secretData = CipherPreferencesStorage.getKeyBytes(context, makeAesTagForAlias(alias));
         if (encryptedData == null || secretData == null) {
             return null;
         }
@@ -169,7 +176,7 @@ class CipherStorageSharedPreferencesKeystore extends BaseCipherStorage {
     private byte[] encryptData(String alias, String value, PublicKey publicKey) {
         SecretKey secret = generateKeyAes(alias);
         CipherPreferencesStorage.saveKeyBytes(context,
-                "aes!"+alias, encryptRsa(secret.getEncoded(), publicKey));
+                makeAesTagForAlias(alias), encryptRsa(secret.getEncoded(), publicKey));
 
         return encryptAes(alias, value, secret);
     }
@@ -204,5 +211,9 @@ class CipherStorageSharedPreferencesKeystore extends BaseCipherStorage {
                 | BadPaddingException | IllegalBlockSizeException e) {
             throw new CryptoFailedException("Unable to encrypt RSA", e);
         }
+    }
+
+    private static String makeAesTagForAlias(String alias) {
+        return AES_TAG_PREFIX + alias;
     }
 }

@@ -24,9 +24,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 
 abstract class BaseCipherStorage implements CipherStorage {
-    protected static final String ANDROID_KEY_STORE = "AndroidKeyStore";
-
-    protected final Context context;
+    static final String ANDROID_KEY_STORE = "AndroidKeyStore";
+    final Context context;
 
     BaseCipherStorage(Context context) {
         this.context = context;
@@ -36,7 +35,8 @@ abstract class BaseCipherStorage implements CipherStorage {
     public boolean containsAlias(String alias) {
         try {
             KeyStore keyStore = getKeyStoreAndLoad();
-            return keyStore.containsAlias(alias);
+            return keyStore.containsAlias(alias) &&
+                    CipherPreferencesStorage.containsAlias(context, alias);
         } catch (KeyStoreException e) {
             throw new KeyStoreAccessException("Failed to access Keystore", e);
         }
@@ -63,7 +63,7 @@ abstract class BaseCipherStorage implements CipherStorage {
         encrypt(alias, value);
     }
 
-    protected static KeyStore getKeyStoreAndLoad() {
+    static KeyStore getKeyStoreAndLoad() {
         try {
             KeyStore keyStore = KeyStore.getInstance(ANDROID_KEY_STORE);
             keyStore.load(null);
