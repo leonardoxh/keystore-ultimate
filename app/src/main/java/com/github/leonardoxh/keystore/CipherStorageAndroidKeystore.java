@@ -33,7 +33,6 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.UnrecoverableKeyException;
-import java.security.cert.CertificateException;
 import java.security.spec.AlgorithmParameterSpec;
 
 import javax.annotation.Nullable;
@@ -45,7 +44,7 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 
 @TargetApi(Build.VERSION_CODES.M)
-class CipherStorageAndroidKeystore implements CipherStorage {
+class CipherStorageAndroidKeystore extends BaseCipherStorage {
     private static final String KEYSTORE_TYPE = "AndroidKeyStore";
     private static final String ENCRYPTION_ALGORITHM = KeyProperties.KEY_ALGORITHM_AES;
     private static final String ENCRYPTION_BLOCK_MODE = KeyProperties.BLOCK_MODE_CBC;
@@ -57,10 +56,8 @@ class CipherStorageAndroidKeystore implements CipherStorage {
     private static final int ENCRYPTION_KEY_SIZE = 256;
     private static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
 
-    private final Context context;
-
     CipherStorageAndroidKeystore(Context context) {
-        this.context = context;
+        super(context);
     }
 
     @Override
@@ -82,17 +79,6 @@ class CipherStorageAndroidKeystore implements CipherStorage {
         }
     }
 
-    private static AlgorithmParameterSpec generateParameterSpec(String alias) {
-        return new KeyGenParameterSpec.Builder(
-                alias,
-                KeyProperties.PURPOSE_DECRYPT | KeyProperties.PURPOSE_ENCRYPT)
-                .setBlockModes(ENCRYPTION_BLOCK_MODE)
-                .setEncryptionPaddings(ENCRYPTION_PADDING)
-                .setRandomizedEncryptionRequired(true)
-                .setKeySize(ENCRYPTION_KEY_SIZE)
-                .build();
-    }
-
     @Nullable
     @Override
     public String decrypt(String alias) {
@@ -110,35 +96,15 @@ class CipherStorageAndroidKeystore implements CipherStorage {
         }
     }
 
-    @Override
-    public void saveOrReplace(String alias, String value) {
-        if (containsAlias(alias)) {
-            removeKey(alias);
-        }
-        encrypt(alias, value);
-    }
-
-    @Override
-    public void removeKey(String alias) {
-        try {
-            KeyStore keyStore = getKeyStoreAndLoad();
-            if (keyStore.containsAlias(alias)) {
-                keyStore.deleteEntry(alias);
-                CipherPreferencesStorage.remove(context, alias);
-            }
-        } catch (KeyStoreException e) {
-            throw new KeyStoreAccessException("Failed to access Keystore", e);
-        }
-    }
-
-    @Override
-    public boolean containsAlias(String alias) {
-        try {
-            KeyStore keyStore = getKeyStoreAndLoad();
-            return keyStore.containsAlias(alias);
-        } catch (KeyStoreException e) {
-            throw new KeyStoreAccessException("Failed to access Keystore", e);
-        }
+    private static AlgorithmParameterSpec generateParameterSpec(String alias) {
+        return new KeyGenParameterSpec.Builder(
+                alias,
+                KeyProperties.PURPOSE_DECRYPT | KeyProperties.PURPOSE_ENCRYPT)
+                .setBlockModes(ENCRYPTION_BLOCK_MODE)
+                .setEncryptionPaddings(ENCRYPTION_PADDING)
+                .setRandomizedEncryptionRequired(true)
+                .setKeySize(ENCRYPTION_KEY_SIZE)
+                .build();
     }
 
     private static String decryptBytes(Key key, byte[] bytes) throws CryptoFailedException {
@@ -188,16 +154,6 @@ class CipherStorageAndroidKeystore implements CipherStorage {
             return outputStream.toByteArray();
         } catch (IOException | NoSuchAlgorithmException | InvalidKeyException | NoSuchPaddingException e) {
             throw new CryptoFailedException("Could not encrypt value", e);
-        }
-    }
-
-    private static KeyStore getKeyStoreAndLoad() throws KeyStoreException, KeyStoreAccessException {
-        try {
-            KeyStore keyStore = KeyStore.getInstance(KEYSTORE_TYPE);
-            keyStore.load(null);
-            return keyStore;
-        } catch (NoSuchAlgorithmException | CertificateException | IOException e) {
-            throw new KeyStoreAccessException("Could not access Keystore", e);
         }
     }
 }

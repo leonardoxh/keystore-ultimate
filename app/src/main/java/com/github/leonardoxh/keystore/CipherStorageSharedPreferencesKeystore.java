@@ -20,7 +20,6 @@ import android.content.Context;
 import android.os.Build;
 import android.security.KeyPairGeneratorSpec;
 
-import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.security.InvalidAlgorithmParameterException;
@@ -33,7 +32,6 @@ import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.UnrecoverableEntryException;
-import java.security.cert.CertificateException;
 import java.security.spec.AlgorithmParameterSpec;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -49,8 +47,7 @@ import javax.crypto.spec.SecretKeySpec;
 import javax.security.auth.x500.X500Principal;
 
 @TargetApi(Build.VERSION_CODES.LOLLIPOP_MR1)
-class CipherStorageSharedPreferencesKeystore implements CipherStorage {
-    private static final String ANDROID_KEY_STORE = "AndroidKeyStore";
+class CipherStorageSharedPreferencesKeystore extends BaseCipherStorage {
     private static final String KEY_ALGORITHM_RSA = "RSA";
     private static final String KEY_ALGORITHM_AES = "AES";
     private static final String TRANSFORMATION = "RSA/ECB/PKCS1Padding";
@@ -58,10 +55,8 @@ class CipherStorageSharedPreferencesKeystore implements CipherStorage {
     private static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
     private static final BigInteger KEY_SERIAL_NUMBER = BigInteger.valueOf(1338);
 
-    private final Context context;
-
     CipherStorageSharedPreferencesKeystore(Context context) {
-        this.context = context;
+        super(context);
     }
 
     @Override
@@ -89,18 +84,9 @@ class CipherStorageSharedPreferencesKeystore implements CipherStorage {
     }
 
     @Override
-    public boolean containsAlias(String alias) {
-        return CipherPreferencesStorage.containsAlias(context, alias);
-    }
-
-    @Override
     public void removeKey(String alias) {
-        CipherPreferencesStorage.remove(context, alias);
-    }
-
-    @Override
-    public void saveOrReplace(String alias, String value) {
-        encrypt(alias, value);
+        super.removeKey(alias);
+        CipherPreferencesStorage.remove(context, "aes!" + alias);
     }
 
     @Nullable
@@ -165,8 +151,7 @@ class CipherStorageSharedPreferencesKeystore implements CipherStorage {
     @Nullable
     private KeyStore.Entry getKeyStoreEntry(boolean shouldGenerateKey, String alias) {
         try {
-            KeyStore keyStore = KeyStore.getInstance(ANDROID_KEY_STORE);
-            keyStore.load(null);
+            KeyStore keyStore = getKeyStoreAndLoad();
 
             KeyStore.Entry entry = keyStore.getEntry(alias, null);
             if (entry == null) {
@@ -176,8 +161,7 @@ class CipherStorageSharedPreferencesKeystore implements CipherStorage {
                 }
             }
             return entry;
-        } catch (KeyStoreException | CertificateException | NoSuchAlgorithmException |
-                IOException | UnrecoverableEntryException e) {
+        } catch (KeyStoreException | NoSuchAlgorithmException | UnrecoverableEntryException e) {
             throw new KeyStoreAccessException("Unable to access keystore", e);
         }
     }
