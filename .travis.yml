@@ -13,7 +13,7 @@ android:
     - sys-img-armeabi-v7a-android-24
 before_script:
   - echo no | android create avd --force -n testEmulator -t android-24 --abi armeabi-v7a
-  - emulator -avd testEmulator -no-skin -no-audio -no-window &
+  - emulator -avd testEmulator -no-skin -no-window &
   - android-wait-for-emulator
   - adb shell input keyevent 82 &
 script:
