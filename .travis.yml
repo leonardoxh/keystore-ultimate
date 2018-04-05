@@ -14,7 +14,6 @@ android:
 before_script:
   - echo no | android create avd --force -n testEmulator -t android-24 --abi armeabi-v7a
   - emulator -avd testEmulator -no-skin -no-window &
-  - android-wait-for-emulator
   - adb shell input keyevent 82 &
 script:
   - ./gradlew connectedAndroidTest
