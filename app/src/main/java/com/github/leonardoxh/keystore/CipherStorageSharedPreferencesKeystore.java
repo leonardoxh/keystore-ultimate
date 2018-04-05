@@ -100,9 +100,6 @@ class CipherStorageSharedPreferencesKeystore implements CipherStorage {
 
     @Override
     public void saveOrReplace(String alias, String value) {
-        if (containsAlias(alias)) {
-            removeKey(alias);
-        }
         encrypt(alias, value);
     }
 
