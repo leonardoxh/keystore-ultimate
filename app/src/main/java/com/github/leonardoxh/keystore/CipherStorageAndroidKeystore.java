@@ -45,7 +45,7 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 
 @TargetApi(Build.VERSION_CODES.M)
-public class CipherStorageAndroidKeystore implements CipherStorage {
+class CipherStorageAndroidKeystore implements CipherStorage {
     private static final String KEYSTORE_TYPE = "AndroidKeyStore";
     private static final String ENCRYPTION_ALGORITHM = KeyProperties.KEY_ALGORITHM_AES;
     private static final String ENCRYPTION_BLOCK_MODE = KeyProperties.BLOCK_MODE_CBC;
@@ -59,7 +59,7 @@ public class CipherStorageAndroidKeystore implements CipherStorage {
 
     private final Context context;
 
-    public CipherStorageAndroidKeystore(Context context) {
+    CipherStorageAndroidKeystore(Context context) {
         this.context = context;
     }
 
@@ -68,17 +68,8 @@ public class CipherStorageAndroidKeystore implements CipherStorage {
         try {
             KeyStore keyStore = getKeyStoreAndLoad();
 
-            AlgorithmParameterSpec spec = new KeyGenParameterSpec.Builder(
-                    alias,
-                    KeyProperties.PURPOSE_DECRYPT | KeyProperties.PURPOSE_ENCRYPT)
-                    .setBlockModes(ENCRYPTION_BLOCK_MODE)
-                    .setEncryptionPaddings(ENCRYPTION_PADDING)
-                    .setRandomizedEncryptionRequired(true)
-                    .setKeySize(ENCRYPTION_KEY_SIZE)
-                    .build();
-
             KeyGenerator generator = KeyGenerator.getInstance(ENCRYPTION_ALGORITHM, KEYSTORE_TYPE);
-            generator.init(spec);
+            generator.init(generateParameterSpec(alias));
             generator.generateKey();
 
             Key key = keyStore.getKey(alias, null);
@@ -89,6 +80,17 @@ public class CipherStorageAndroidKeystore implements CipherStorage {
         } catch (KeyStoreException | KeyStoreAccessException e) {
             throw new CryptoFailedException("Could not access Keystore", e);
         }
+    }
+
+    private static AlgorithmParameterSpec generateParameterSpec(String alias) {
+        return new KeyGenParameterSpec.Builder(
+                alias,
+                KeyProperties.PURPOSE_DECRYPT | KeyProperties.PURPOSE_ENCRYPT)
+                .setBlockModes(ENCRYPTION_BLOCK_MODE)
+                .setEncryptionPaddings(ENCRYPTION_PADDING)
+                .setRandomizedEncryptionRequired(true)
+                .setKeySize(ENCRYPTION_KEY_SIZE)
+                .build();
     }
 
     @Nullable
@@ -159,7 +161,8 @@ public class CipherStorageAndroidKeystore implements CipherStorage {
                 output.write(buffer, 0, n);
             }
             return new String(output.toByteArray(), DEFAULT_CHARSET);
-        } catch (Exception e) {
+        } catch (IOException | NoSuchAlgorithmException | NoSuchPaddingException |
+                InvalidKeyException | InvalidAlgorithmParameterException e) {
             throw new CryptoFailedException("Could not decrypt bytes", e);
         }
     }

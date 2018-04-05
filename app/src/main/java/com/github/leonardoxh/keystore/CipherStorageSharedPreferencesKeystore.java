@@ -15,9 +15,10 @@
  */
 package com.github.leonardoxh.keystore;
 
+import android.annotation.TargetApi;
 import android.content.Context;
+import android.os.Build;
 import android.security.KeyPairGeneratorSpec;
-import android.util.Base64;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -47,7 +48,8 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import javax.security.auth.x500.X500Principal;
 
-public class CipherStorageSharedPreferencesKeystore implements CipherStorage {
+@TargetApi(Build.VERSION_CODES.LOLLIPOP_MR1)
+class CipherStorageSharedPreferencesKeystore implements CipherStorage {
     private static final String ANDROID_KEY_STORE = "AndroidKeyStore";
     private static final String KEY_ALGORITHM_RSA = "RSA";
     private static final String KEY_ALGORITHM_AES = "AES";
@@ -58,7 +60,7 @@ public class CipherStorageSharedPreferencesKeystore implements CipherStorage {
 
     private final Context context;
 
-    public CipherStorageSharedPreferencesKeystore(Context context) {
+    CipherStorageSharedPreferencesKeystore(Context context) {
         this.context = context;
     }
 
@@ -70,9 +72,9 @@ public class CipherStorageSharedPreferencesKeystore implements CipherStorage {
         }
 
         KeyStore.PrivateKeyEntry key = (KeyStore.PrivateKeyEntry) entry;
-        String encryptedData = encryptData(alias, value, key.getCertificate().getPublicKey());
+        byte[] encryptedData = encryptData(alias, value, key.getCertificate().getPublicKey());
 
-        CipherPreferencesStorage.saveKeyString(context, alias, encryptedData);
+        CipherPreferencesStorage.saveKeyBytes(context, alias, encryptedData);
     }
 
     @Nullable
@@ -106,20 +108,18 @@ public class CipherStorageSharedPreferencesKeystore implements CipherStorage {
 
     @Nullable
     private String decryptData(String alias, PrivateKey privateKey) {
-        String encryptedData = CipherPreferencesStorage.getKeyString(context, alias);
-        String secretData = CipherPreferencesStorage.getKeyString(context, "aes!"+alias);
+        byte[] encryptedData = CipherPreferencesStorage.getKeyBytes(context, alias);
+        byte[] secretData = CipherPreferencesStorage.getKeyBytes(context, "aes!"+alias);
         if (encryptedData == null || secretData == null) {
             return null;
         }
-        byte[] decodedData = Base64.decode(encryptedData, Base64.DEFAULT);
-        byte[] decryptedData = decryptRsa(decodedData, privateKey);
-        byte[] decodedSecret = Base64.decode(secretData, Base64.DEFAULT);
-        SecretKeySpec secretKey = new SecretKeySpec(decodedSecret, 0, decodedSecret.length, KEY_ALGORITHM_AES);
-        byte[] finalData = decryptAes(decryptedData, secretKey);
+        byte[] decryptedData = decryptRsa(secretData, privateKey);
+        SecretKeySpec secretKey = new SecretKeySpec(decryptedData, 0, decryptedData.length, KEY_ALGORITHM_AES);
+        byte[] finalData = decryptAes(encryptedData, secretKey);
         return new String(finalData, DEFAULT_CHARSET);
     }
 
-    private byte[] decryptAes(byte[] decryptedKey, SecretKey secret) {
+    private static byte[] decryptAes(byte[] decryptedKey, SecretKey secret) {
         try {
             Cipher cipherAes = Cipher.getInstance(KEY_ALGORITHM_AES);
             cipherAes.init(Cipher.DECRYPT_MODE, secret);
@@ -130,7 +130,7 @@ public class CipherStorageSharedPreferencesKeystore implements CipherStorage {
         }
     }
 
-    private byte[] decryptRsa(byte[] inputByteArray, PrivateKey secretKey) {
+    private static byte[] decryptRsa(byte[] inputByteArray, PrivateKey secretKey) {
         try {
             Cipher cipher = Cipher.getInstance(TRANSFORMATION);
             cipher.init(Cipher.PRIVATE_KEY, secretKey);
@@ -138,18 +138,6 @@ public class CipherStorageSharedPreferencesKeystore implements CipherStorage {
         } catch (NoSuchPaddingException | NoSuchAlgorithmException |
                 InvalidKeyException | BadPaddingException | IllegalBlockSizeException e) {
             throw new CryptoFailedException("Unable to decrypt key RSA", e);
-        }
-    }
-
-    private SecretKey generateKeyAes(String alias) {
-        try {
-            KeyGenerator generator = KeyGenerator.getInstance(KEY_ALGORITHM_AES);
-            generator.init(ENCRYPTION_KEY_SIZE);
-            SecretKey secret = generator.generateKey();
-            CipherPreferencesStorage.saveKeyString(context, "aes!"+alias, Base64.encodeToString(secret.getEncoded(), Base64.DEFAULT));
-            return secret;
-        } catch (NoSuchAlgorithmException e) {
-            throw new CryptoFailedException("Unable to generate key for alias " + alias, e);
         }
     }
 
@@ -197,32 +185,43 @@ public class CipherStorageSharedPreferencesKeystore implements CipherStorage {
         }
     }
 
-    private String encryptData(String alias, String value, PublicKey publicKey) {
-        byte[] data = value.getBytes(DEFAULT_CHARSET);
-        byte[] aesData = encryptAes(data, alias);
-        byte[] encryptedInput = encryptRsa(aesData, publicKey);
-        return Base64.encodeToString(encryptedInput, Base64.DEFAULT);
+    private byte[] encryptData(String alias, String value, PublicKey publicKey) {
+        SecretKey secret = generateKeyAes(alias);
+        CipherPreferencesStorage.saveKeyBytes(context,
+                "aes!"+alias, encryptRsa(secret.getEncoded(), publicKey));
+
+        return encryptAes(alias, value, secret);
     }
 
-    private byte[] encryptAes(byte[] inputByteArray, String alias) {
+    private byte[] encryptAes(String alias, String value, SecretKey secret) {
         try {
             Cipher cipherAes = Cipher.getInstance(KEY_ALGORITHM_AES);
-            cipherAes.init(Cipher.ENCRYPT_MODE, generateKeyAes(alias));
-            return cipherAes.doFinal(inputByteArray);
+            cipherAes.init(Cipher.ENCRYPT_MODE, secret);
+            return cipherAes.doFinal(value.getBytes(DEFAULT_CHARSET));
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException
                 | BadPaddingException | IllegalBlockSizeException e) {
-            throw new CryptoFailedException("Unable to encrypt key aes for alias " + alias);
+            throw new CryptoFailedException("Unable to encrypt key aes for alias " + alias, e);
         }
     }
 
-    private byte[] encryptRsa(byte[] inputByteArray, PublicKey publicKey) {
+    private SecretKey generateKeyAes(String alias) {
+        try {
+            KeyGenerator generator = KeyGenerator.getInstance(KEY_ALGORITHM_AES);
+            generator.init(ENCRYPTION_KEY_SIZE);
+            return generator.generateKey();
+        } catch (NoSuchAlgorithmException e) {
+            throw new CryptoFailedException("Unable to generate key for alias " + alias, e);
+        }
+    }
+
+    private static byte[] encryptRsa(byte[] inputByteArray, PublicKey publicKey) {
         try {
             Cipher cipher = Cipher.getInstance(TRANSFORMATION);
             cipher.init(Cipher.PUBLIC_KEY, publicKey);
             return cipher.doFinal(inputByteArray);
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException
                 | BadPaddingException | IllegalBlockSizeException e) {
-            throw new CryptoFailedException("Unable to encrypt RSA");
+            throw new CryptoFailedException("Unable to encrypt RSA", e);
         }
     }
 }

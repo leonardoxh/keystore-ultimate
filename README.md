@@ -9,11 +9,7 @@ it automatically deals with old Android keystore implementation (pre api 23) and
 Usage:
 ---
 ```java
-//for api 23 and above
-CipherStorage cipherStorage = new CipherStorageAndroidKeystore(context);
-//for api 22 and bellow
-CipherStorage cipherStorage = new CipherStorageSharedPreferencesKeystore(context);
-//if you want the correct implementation you can always use the CipherStorageFactory
+//Just get a instance of the CipherStorage and thats it
 CipherStorage cipherStorage = CipherStorageFactory.newInstance(context);
 //Then you can use the encrypt and decrypt method
 ```
