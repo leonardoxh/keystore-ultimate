@@ -119,7 +119,7 @@ class CipherStorageSharedPreferencesKeystore implements CipherStorage {
         return new String(finalData, DEFAULT_CHARSET);
     }
 
-    private byte[] decryptAes(byte[] decryptedKey, SecretKey secret) {
+    private static byte[] decryptAes(byte[] decryptedKey, SecretKey secret) {
         try {
             Cipher cipherAes = Cipher.getInstance(KEY_ALGORITHM_AES);
             cipherAes.init(Cipher.DECRYPT_MODE, secret);
@@ -130,7 +130,7 @@ class CipherStorageSharedPreferencesKeystore implements CipherStorage {
         }
     }
 
-    private byte[] decryptRsa(byte[] inputByteArray, PrivateKey secretKey) {
+    private static byte[] decryptRsa(byte[] inputByteArray, PrivateKey secretKey) {
         try {
             Cipher cipher = Cipher.getInstance(TRANSFORMATION);
             cipher.init(Cipher.PRIVATE_KEY, secretKey);
@@ -213,7 +213,7 @@ class CipherStorageSharedPreferencesKeystore implements CipherStorage {
         }
     }
 
-    private byte[] encryptRsa(byte[] inputByteArray, PublicKey publicKey) {
+    private static byte[] encryptRsa(byte[] inputByteArray, PublicKey publicKey) {
         try {
             Cipher cipher = Cipher.getInstance(TRANSFORMATION);
             cipher.init(Cipher.PUBLIC_KEY, publicKey);
