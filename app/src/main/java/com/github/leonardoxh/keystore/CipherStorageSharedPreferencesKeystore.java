@@ -138,18 +138,6 @@ class CipherStorageSharedPreferencesKeystore implements CipherStorage {
         }
     }
 
-    private SecretKey generateKeyAes(String alias) {
-        try {
-            KeyGenerator generator = KeyGenerator.getInstance(KEY_ALGORITHM_AES);
-            generator.init(ENCRYPTION_KEY_SIZE);
-            SecretKey secret = generator.generateKey();
-            CipherPreferencesStorage.saveKeyBytes(context, "aes!"+alias, secret.getEncoded());
-            return secret;
-        } catch (NoSuchAlgorithmException e) {
-            throw new CryptoFailedException("Unable to generate key for alias " + alias, e);
-        }
-    }
-
     private void generateKeyRsa(String alias) {
         try {
             KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(KEY_ALGORITHM_RSA, ANDROID_KEY_STORE);
@@ -195,19 +183,30 @@ class CipherStorageSharedPreferencesKeystore implements CipherStorage {
     }
 
     private byte[] encryptData(String alias, String value, PublicKey publicKey) {
-        byte[] data = value.getBytes(DEFAULT_CHARSET);
-        byte[] aesData = encryptAes(data, alias);
+        byte[] aesData = encryptAes(alias, value);
         return encryptRsa(aesData, publicKey);
     }
 
-    private byte[] encryptAes(byte[] inputByteArray, String alias) {
+    private byte[] encryptAes(String alias, String value) {
         try {
             Cipher cipherAes = Cipher.getInstance(KEY_ALGORITHM_AES);
             cipherAes.init(Cipher.ENCRYPT_MODE, generateKeyAes(alias));
-            return cipherAes.doFinal(inputByteArray);
+            return cipherAes.doFinal(value.getBytes(DEFAULT_CHARSET));
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException
                 | BadPaddingException | IllegalBlockSizeException e) {
             throw new CryptoFailedException("Unable to encrypt key aes for alias " + alias);
+        }
+    }
+
+    private SecretKey generateKeyAes(String alias) {
+        try {
+            KeyGenerator generator = KeyGenerator.getInstance(KEY_ALGORITHM_AES);
+            generator.init(ENCRYPTION_KEY_SIZE);
+            SecretKey secret = generator.generateKey();
+            CipherPreferencesStorage.saveKeyBytes(context, "aes!"+alias, secret.getEncoded());
+            return secret;
+        } catch (NoSuchAlgorithmException e) {
+            throw new CryptoFailedException("Unable to generate key for alias " + alias, e);
         }
     }
 

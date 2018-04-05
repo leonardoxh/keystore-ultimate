@@ -68,17 +68,8 @@ class CipherStorageAndroidKeystore implements CipherStorage {
         try {
             KeyStore keyStore = getKeyStoreAndLoad();
 
-            AlgorithmParameterSpec spec = new KeyGenParameterSpec.Builder(
-                    alias,
-                    KeyProperties.PURPOSE_DECRYPT | KeyProperties.PURPOSE_ENCRYPT)
-                    .setBlockModes(ENCRYPTION_BLOCK_MODE)
-                    .setEncryptionPaddings(ENCRYPTION_PADDING)
-                    .setRandomizedEncryptionRequired(true)
-                    .setKeySize(ENCRYPTION_KEY_SIZE)
-                    .build();
-
             KeyGenerator generator = KeyGenerator.getInstance(ENCRYPTION_ALGORITHM, KEYSTORE_TYPE);
-            generator.init(spec);
+            generator.init(generateParameterSpec(alias));
             generator.generateKey();
 
             Key key = keyStore.getKey(alias, null);
@@ -89,6 +80,17 @@ class CipherStorageAndroidKeystore implements CipherStorage {
         } catch (KeyStoreException | KeyStoreAccessException e) {
             throw new CryptoFailedException("Could not access Keystore", e);
         }
+    }
+
+    private static AlgorithmParameterSpec generateParameterSpec(String alias) {
+        return new KeyGenParameterSpec.Builder(
+                alias,
+                KeyProperties.PURPOSE_DECRYPT | KeyProperties.PURPOSE_ENCRYPT)
+                .setBlockModes(ENCRYPTION_BLOCK_MODE)
+                .setEncryptionPaddings(ENCRYPTION_PADDING)
+                .setRandomizedEncryptionRequired(true)
+                .setKeySize(ENCRYPTION_KEY_SIZE)
+                .build();
     }
 
     @Nullable
