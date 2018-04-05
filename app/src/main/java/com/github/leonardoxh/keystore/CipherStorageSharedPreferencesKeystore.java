@@ -47,7 +47,7 @@ import javax.crypto.spec.SecretKeySpec;
 import javax.security.auth.x500.X500Principal;
 
 @TargetApi(Build.VERSION_CODES.LOLLIPOP_MR1)
-class CipherStorageSharedPreferencesKeystore extends BaseCipherStorage {
+final class CipherStorageSharedPreferencesKeystore extends BaseCipherStorage {
     private static final String KEY_ALGORITHM_RSA = "RSA";
     private static final String KEY_ALGORITHM_AES = "AES";
     private static final String TRANSFORMATION = "RSA/ECB/PKCS1Padding";

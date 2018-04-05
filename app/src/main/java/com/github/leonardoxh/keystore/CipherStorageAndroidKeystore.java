@@ -44,7 +44,7 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 
 @TargetApi(Build.VERSION_CODES.M)
-class CipherStorageAndroidKeystore extends BaseCipherStorage {
+final class CipherStorageAndroidKeystore extends BaseCipherStorage {
     private static final String KEYSTORE_TYPE = "AndroidKeyStore";
     private static final String ENCRYPTION_ALGORITHM = KeyProperties.KEY_ALGORITHM_AES;
     private static final String ENCRYPTION_BLOCK_MODE = KeyProperties.BLOCK_MODE_CBC;

@@ -16,39 +16,38 @@
 package com.github.leonardoxh.keystore;
 
 import android.content.Context;
+import android.preference.PreferenceManager;
 import android.util.Base64;
 
 import javax.annotation.Nullable;
 
 final class CipherPreferencesStorage {
-    private static final String SHARED_PREFERENCES_NAME = "security_storage";
-
     private CipherPreferencesStorage() {
         throw new AssertionError();
     }
 
     private static void saveKeyString(Context context, String alias, String value) {
-        context.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE)
+        PreferenceManager.getDefaultSharedPreferences(context)
                 .edit()
                 .putString(alias, value)
                 .apply();
     }
 
     static void remove(Context context, String alias) {
-        context.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE)
+        PreferenceManager.getDefaultSharedPreferences(context)
                 .edit()
                 .remove(alias)
                 .apply();
     }
 
     static boolean containsAlias(Context context, String alias) {
-        return context.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE)
+        return PreferenceManager.getDefaultSharedPreferences(context)
                 .contains(alias);
     }
 
     @Nullable
     private static String getKeyString(Context context, String alias) {
-        return context.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE)
+        return PreferenceManager.getDefaultSharedPreferences(context)
                 .getString(alias, null);
     }
 
