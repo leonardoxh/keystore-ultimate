@@ -15,7 +15,9 @@
  */
 package com.github.leonardoxh.keystore;
 
+import android.annotation.TargetApi;
 import android.content.Context;
+import android.os.Build;
 import android.security.KeyPairGeneratorSpec;
 
 import java.io.IOException;
@@ -46,6 +48,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import javax.security.auth.x500.X500Principal;
 
+@TargetApi(Build.VERSION_CODES.LOLLIPOP_MR1)
 class CipherStorageSharedPreferencesKeystore implements CipherStorage {
     private static final String ANDROID_KEY_STORE = "AndroidKeyStore";
     private static final String KEY_ALGORITHM_RSA = "RSA";
