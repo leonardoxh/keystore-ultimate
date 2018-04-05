@@ -26,7 +26,7 @@ Inspiration:
 
 Limitations:
 ---
-* On Api level 22 and bellow your key should not contain more than 256 bytes otherwise we can't save
+* On Api level 22 and bellow your alias for key should not contain more than 256 bytes otherwise we can't save
 the the value due a limitation on the Android Keystore
 
 LICENSE:
