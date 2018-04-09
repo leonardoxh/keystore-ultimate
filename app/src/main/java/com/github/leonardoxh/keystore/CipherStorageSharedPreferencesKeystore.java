@@ -24,6 +24,7 @@ import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
+import java.security.Key;
 import java.security.KeyPairGenerator;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -35,6 +36,7 @@ import java.security.UnrecoverableEntryException;
 import java.security.spec.AlgorithmParameterSpec;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.Locale;
 
 import javax.annotation.Nullable;
 import javax.crypto.BadPaddingException;
@@ -103,32 +105,11 @@ final class CipherStorageSharedPreferencesKeystore extends BaseCipherStorage {
         if (encryptedData == null || secretData == null) {
             return null;
         }
-        byte[] decryptedData = decryptRsa(secretData, privateKey);
+
+        byte[] decryptedData = cipherEncryption(TRANSFORMATION, Cipher.PRIVATE_KEY, privateKey, secretData);
         SecretKeySpec secretKey = new SecretKeySpec(decryptedData, 0, decryptedData.length, KEY_ALGORITHM_AES);
-        byte[] finalData = decryptAes(encryptedData, secretKey);
+        byte[] finalData = cipherEncryption(KEY_ALGORITHM_AES, Cipher.DECRYPT_MODE, secretKey, encryptedData);
         return new String(finalData, DEFAULT_CHARSET);
-    }
-
-    private static byte[] decryptAes(byte[] decryptedKey, SecretKey secret) {
-        try {
-            Cipher cipherAes = Cipher.getInstance(KEY_ALGORITHM_AES);
-            cipherAes.init(Cipher.DECRYPT_MODE, secret);
-            return cipherAes.doFinal(decryptedKey);
-        } catch (NoSuchPaddingException | NoSuchAlgorithmException |
-                InvalidKeyException | BadPaddingException | IllegalBlockSizeException e) {
-            throw new CryptoFailedException("Unable to decrypt key AES", e);
-        }
-    }
-
-    private static byte[] decryptRsa(byte[] inputByteArray, PrivateKey secretKey) {
-        try {
-            Cipher cipher = Cipher.getInstance(TRANSFORMATION);
-            cipher.init(Cipher.PRIVATE_KEY, secretKey);
-            return cipher.doFinal(inputByteArray);
-        } catch (NoSuchPaddingException | NoSuchAlgorithmException |
-                InvalidKeyException | BadPaddingException | IllegalBlockSizeException e) {
-            throw new CryptoFailedException("Unable to decrypt key RSA", e);
-        }
     }
 
     private void generateKeyRsa(String alias) {
@@ -175,21 +156,10 @@ final class CipherStorageSharedPreferencesKeystore extends BaseCipherStorage {
 
     private byte[] encryptData(String alias, String value, PublicKey publicKey) {
         SecretKey secret = generateKeyAes(alias);
+        byte[] rsaEncrypted = cipherEncryption(TRANSFORMATION, Cipher.PUBLIC_KEY, publicKey, secret.getEncoded());
         CipherPreferencesStorage.saveKeyBytes(context,
-                makeAesTagForAlias(alias), encryptRsa(secret.getEncoded(), publicKey));
-
-        return encryptAes(alias, value, secret);
-    }
-
-    private byte[] encryptAes(String alias, String value, SecretKey secret) {
-        try {
-            Cipher cipherAes = Cipher.getInstance(KEY_ALGORITHM_AES);
-            cipherAes.init(Cipher.ENCRYPT_MODE, secret);
-            return cipherAes.doFinal(value.getBytes(DEFAULT_CHARSET));
-        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException
-                | BadPaddingException | IllegalBlockSizeException e) {
-            throw new CryptoFailedException("Unable to encrypt key aes for alias " + alias, e);
-        }
+                makeAesTagForAlias(alias), rsaEncrypted);
+        return cipherEncryption(KEY_ALGORITHM_AES, Cipher.ENCRYPT_MODE, secret, value.getBytes(DEFAULT_CHARSET));
     }
 
     private SecretKey generateKeyAes(String alias) {
@@ -202,18 +172,20 @@ final class CipherStorageSharedPreferencesKeystore extends BaseCipherStorage {
         }
     }
 
-    private static byte[] encryptRsa(byte[] inputByteArray, PublicKey publicKey) {
-        try {
-            Cipher cipher = Cipher.getInstance(TRANSFORMATION);
-            cipher.init(Cipher.PUBLIC_KEY, publicKey);
-            return cipher.doFinal(inputByteArray);
-        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException
-                | BadPaddingException | IllegalBlockSizeException e) {
-            throw new CryptoFailedException("Unable to encrypt RSA", e);
-        }
-    }
-
     private static String makeAesTagForAlias(String alias) {
         return AES_TAG_PREFIX + alias;
+    }
+
+    private static byte[] cipherEncryption(String transformation, int mode, Key key,
+                                           byte[] inputByteArray) {
+        try {
+            Cipher cipher = Cipher.getInstance(transformation);
+            cipher.init(mode, key);
+            return cipher.doFinal(inputByteArray);
+        } catch (NoSuchPaddingException | NoSuchAlgorithmException |
+                InvalidKeyException | BadPaddingException | IllegalBlockSizeException e) {
+            throw new CryptoFailedException(String.format(Locale.US,
+                    "Unable to do cipher for transformation %s and mode %d", transformation, mode), e);
+        }
     }
 }
