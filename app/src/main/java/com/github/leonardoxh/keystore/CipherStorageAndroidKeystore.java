@@ -59,6 +59,9 @@ final class CipherStorageAndroidKeystore extends BaseCipherStorage {
         super(context);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void encrypt(String alias, String value) {
         try {
@@ -78,6 +81,9 @@ final class CipherStorageAndroidKeystore extends BaseCipherStorage {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Nullable
     @Override
     public String decrypt(String alias) {

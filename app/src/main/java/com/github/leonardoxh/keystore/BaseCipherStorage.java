@@ -31,6 +31,9 @@ abstract class BaseCipherStorage implements CipherStorage {
         this.context = context;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean containsAlias(String alias) {
         try {
@@ -42,6 +45,9 @@ abstract class BaseCipherStorage implements CipherStorage {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void removeKey(String alias) {
         try {
@@ -55,6 +61,9 @@ abstract class BaseCipherStorage implements CipherStorage {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void saveOrReplace(String alias, String value) {
         if (containsAlias(alias)) {

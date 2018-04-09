@@ -62,6 +62,9 @@ final class CipherStorageSharedPreferencesKeystore extends BaseCipherStorage {
         super(context);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void encrypt(String alias, String value) {
         KeyStore.Entry entry = getKeyStoreEntry(true, alias);
@@ -75,6 +78,9 @@ final class CipherStorageSharedPreferencesKeystore extends BaseCipherStorage {
         CipherPreferencesStorage.saveKeyBytes(context, alias, encryptedData);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Nullable
     @Override
     public String decrypt(String alias) {
@@ -86,12 +92,18 @@ final class CipherStorageSharedPreferencesKeystore extends BaseCipherStorage {
         return decryptData(alias, key.getPrivateKey());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean containsAlias(String alias) {
         return super.containsAlias(alias)
                 && CipherPreferencesStorage.containsAlias(context, makeAesTagForAlias(alias));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void removeKey(String alias) {
         super.removeKey(alias);
