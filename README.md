@@ -17,7 +17,7 @@ CipherStorage cipherStorage = CipherStorageFactory.newInstance(context);
 Gradle dependency:
 ---
 ```groovy
-implementation 'com.github.leonardoxh:keystore-ultimate:1.1.2'
+implementation 'com.github.leonardoxh:keystore-ultimate:1.1.3'
 ```
 
 Inspiration:
