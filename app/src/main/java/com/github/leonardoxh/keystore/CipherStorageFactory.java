@@ -39,7 +39,7 @@ public final class CipherStorageFactory {
      *                it's only used for Android Shared Preferences access
      * @return a new {@link CipherStorage} based on the current api level
      */
-    public CipherStorage newInstance(Context context) {
+    public static CipherStorage newInstance(Context context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             return new CipherStorageAndroidKeystore(context);
         }
