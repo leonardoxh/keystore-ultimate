@@ -1,0 +1,36 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion Integer.parseInt(COMPILE_SDK_VERSION)
+
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+        }
+    }
+
+    defaultConfig {
+        applicationId "com.github.leonardoxh.keystore.sample"
+        minSdkVersion MIN_SDK_VERSION
+        versionCode 1
+        versionName "1.0"
+
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+}
+
+dependencies {
+    implementation 'com.android.support:appcompat-v7:27.1.1'
+    testImplementation 'com.google.truth:truth:0.40'
+    testImplementation 'org.robolectric:robolectric:3.8'
+
+    implementation project(":keystore")
+    testImplementation project(":keystoretest")
+}
