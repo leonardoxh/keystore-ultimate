@@ -2,9 +2,9 @@ apply plugin: 'com.android.library'
 apply from: file('../gradle/gradle-mvn-push.gradle')
 
 android {
-    compileSdkVersion 27
+    compileSdkVersion Integer.parseInt(COMPILE_SDK_VERSION)
     defaultConfig {
-        minSdkVersion 21
+        minSdkVersion MIN_SDK_VERSION
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
@@ -13,6 +13,6 @@ android {
 dependencies {
     compileOnly 'com.google.code.findbugs:jsr305:3.0.2'
 
-    androidTestImplementation 'com.android.support.test:runner:1.0.1'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.google.truth:truth:0.40'
 }
