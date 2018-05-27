@@ -1,5 +1,5 @@
 apply plugin: 'com.android.library'
-apply from: file('../gradle/gradle-mvn-push.gradle')
+apply from: file('../gradle/keystore-test-mvn-push.gradle')
 
 android {
     compileSdkVersion Integer.parseInt(COMPILE_SDK_VERSION)
