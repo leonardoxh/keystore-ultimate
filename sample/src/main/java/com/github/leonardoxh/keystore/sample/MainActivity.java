@@ -1,5 +1,6 @@
 package com.github.leonardoxh.keystore.sample;
 
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -20,9 +21,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        cipherStorage = CipherStorageFactory.newInstance(this);
         keyInput = findViewById(R.id.key);
         valueInput = findViewById(R.id.value);
+    }
+
+    @Override
+    protected void onPostCreate(@Nullable Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+
+        cipherStorage = CipherStorageFactory.newInstance(this);
         findViewById(R.id.save).setOnClickListener(this);
         findViewById(R.id.retrieve).setOnClickListener(this);
         findViewById(R.id.erase).setOnClickListener(this);
