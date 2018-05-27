@@ -13,7 +13,7 @@ dependencies {
     compileOnly 'com.google.code.findbugs:jsr305:3.0.2'
     testImplementation 'com.google.truth:truth:0.40'
 
-    api project(":keystore")
+    implementation project(":keystore")
 }
 
 apply from: file('../gradle/keystore-mvn-push.gradle')
