@@ -23,6 +23,6 @@ public class CipherStorageFactoryTest {
     @Test
     public void returnCorrectImplementation() {
         assertThat(CipherStorageFactory.newInstance(null))
-                .isInstanceOf(InMemoryCipherStorageTest.class);
+                .isSameAs(InMemoryCipherStorage.INSTANCE);
     }
 }

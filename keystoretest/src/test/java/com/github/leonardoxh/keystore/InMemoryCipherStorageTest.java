@@ -20,7 +20,7 @@ import org.junit.Test;
 import static com.google.common.truth.Truth.assertThat;
 
 public class InMemoryCipherStorageTest {
-    private final CipherStorage subject = new InMemoryCipherStorage();
+    private final CipherStorage subject = CipherStorageFactory.newInstance(null);
 
     @Test
     public void encryptValues() {

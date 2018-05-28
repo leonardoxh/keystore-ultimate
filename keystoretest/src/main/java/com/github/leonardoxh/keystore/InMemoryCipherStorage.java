@@ -21,6 +21,12 @@ import java.util.Map;
 import javax.annotation.Nullable;
 
 final class InMemoryCipherStorage implements CipherStorage {
+    /**
+     * Default in memory cipher storage instance
+     * this is something to simulate a strong storage between tests
+     */
+    static final InMemoryCipherStorage INSTANCE = new InMemoryCipherStorage();
+
     private final Map<String, String> values = new HashMap<>();
 
     /**

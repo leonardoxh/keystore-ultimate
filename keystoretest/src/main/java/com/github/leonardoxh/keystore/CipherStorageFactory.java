@@ -35,6 +35,6 @@ public final class CipherStorageFactory {
      * @return a {@link InMemoryCipherStorage} for test proposes
      */
     public static CipherStorage newInstance(@Nullable Context context) {
-        return new InMemoryCipherStorage();
+        return InMemoryCipherStorage.INSTANCE;
     }
 }
