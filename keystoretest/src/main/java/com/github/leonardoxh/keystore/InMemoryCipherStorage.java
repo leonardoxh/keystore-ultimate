@@ -20,25 +20,37 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 
-public class InMemoryCipherStorage implements CipherStorage {
+final class InMemoryCipherStorage implements CipherStorage {
     private final Map<String, String> values = new HashMap<>();
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void encrypt(String alias, String value) {
         values.put(alias, value);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Nullable
     @Override
     public String decrypt(String alias) {
         return values.get(alias);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean containsAlias(String alias) {
         return values.containsKey(alias);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void removeKey(String alias) {
         values.remove(alias);
