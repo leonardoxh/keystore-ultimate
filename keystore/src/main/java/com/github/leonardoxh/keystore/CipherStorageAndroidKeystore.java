@@ -74,7 +74,8 @@ final class CipherStorageAndroidKeystore extends BaseCipherStorage {
             Key key = keyStore.getKey(alias, null);
             byte[] encryptedData = encryptString(key, value);
             CipherPreferencesStorage.saveKeyBytes(context, alias, encryptedData);
-        } catch (NoSuchAlgorithmException | InvalidAlgorithmParameterException | NoSuchProviderException | UnrecoverableKeyException e) {
+        } catch (NoSuchAlgorithmException | InvalidAlgorithmParameterException |
+                NoSuchProviderException | UnrecoverableKeyException e) {
             throw new CryptoFailedException("Could not encrypt data", e);
         } catch (KeyStoreException | KeyStoreAccessException e) {
             throw new CryptoFailedException("Could not access Keystore", e);
@@ -88,10 +89,14 @@ final class CipherStorageAndroidKeystore extends BaseCipherStorage {
     @Override
     public String decrypt(String alias) {
         try {
-            KeyStore keyStore = getKeyStoreAndLoad();
-            Key key = keyStore.getKey(alias, null);
             byte[] storedData = CipherPreferencesStorage.getKeyBytes(context, alias);
             if (storedData == null) {
+                return null;
+            }
+            KeyStore keyStore = getKeyStoreAndLoad();
+            Key key = keyStore.getKey(alias, null);
+            if (key == null) {
+                /* Well this should not happen if you do not have a stored byte data, but just in case */
                 return null;
             }
             return decryptBytes(key, storedData);
