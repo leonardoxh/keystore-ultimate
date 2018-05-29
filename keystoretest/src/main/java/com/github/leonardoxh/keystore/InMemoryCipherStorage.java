@@ -62,6 +62,9 @@ final class InMemoryCipherStorage implements CipherStorage {
         values.remove(alias);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void saveOrReplace(String alias, String value) {
         encrypt(alias, value);
