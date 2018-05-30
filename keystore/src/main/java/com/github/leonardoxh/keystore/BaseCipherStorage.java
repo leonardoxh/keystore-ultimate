@@ -61,16 +61,6 @@ abstract class BaseCipherStorage implements CipherStorage {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @deprecated use {@link #encrypt(String, String)} instead
-     */
-    @Override
-    public void saveOrReplace(String alias, String value) {
-        encrypt(alias, value);
-    }
-
     static KeyStore getKeyStoreAndLoad() {
         try {
             KeyStore keyStore = KeyStore.getInstance(ANDROID_KEY_STORE);

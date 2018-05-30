@@ -52,13 +52,6 @@ abstract class CipherBaseTest {
 
     @Test
     public void itReplaceKeyCorrectly() {
-        String valueToStore = "other-alias";
-        subject.saveOrReplace(ALIAS_FOR_TEST, valueToStore);
-        assertThat(subject.decrypt(ALIAS_FOR_TEST)).isEqualTo(valueToStore);
-    }
-
-    @Test
-    public void encryptReplaceKeyCorrectly() {
         subject.encrypt(ALIAS_FOR_TEST, "test");
         assertThat(subject.decrypt(ALIAS_FOR_TEST)).isEqualTo("test");
 

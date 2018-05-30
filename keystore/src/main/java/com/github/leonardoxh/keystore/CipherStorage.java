@@ -23,7 +23,9 @@ import javax.annotation.Nullable;
 public interface CipherStorage {
     /**
      * Encrypt the value associating with this alias
-     * the alias it's the only way to access the value
+     * the alias it's the only way to access the value,
+     * note if you already have the value stored this alias it will
+     * override the current value
      *
      * @param alias the key for the value
      * @param value the value to store
@@ -54,18 +56,4 @@ public interface CipherStorage {
      * @param alias the key for access this value
      */
     void removeKey(String alias);
-
-    /**
-     * Save the key if it doesn't exists if it exists replace
-     *
-     * @see #containsAlias(String)
-     * @see #removeKey(String)
-     * @see #encrypt(String, String)
-     *
-     * @param alias the key for the value
-     * @param value the value to store
-     *
-     * @deprecated use {@link #encrypt(String, String)} instead
-     */
-    void saveOrReplace(String alias, String value);
 }

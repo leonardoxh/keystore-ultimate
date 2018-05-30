@@ -43,8 +43,10 @@ public class InMemoryCipherStorageTest {
 
     @Test
     public void replaceValues() {
-        subject.encrypt("test", "test-alias");
-        subject.saveOrReplace("test", "test-value-replaced");
-        assertThat(subject.decrypt("test")).isEqualTo("test-value-replaced");
+        subject.encrypt("test", "test");
+        assertThat(subject.decrypt("test")).isEqualTo("test");
+
+        subject.encrypt("test", "test-replaced");
+        assertThat(subject.decrypt("test")).isEqualTo("test-replaced");
     }
 }
