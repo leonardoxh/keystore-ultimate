@@ -32,6 +32,10 @@ anything on your source code:
 testImplementation 'com.github.leonardoxh:keystore-ultimate-test:1.1.9'
 ```
 
+Library usage?
+---
+* Did you use this library? Please notify me via email leonardoxh@gmail.com I would love to receive feedbacks and see if this library is used in some project and if it's helping somehow.
+
 Inspiration:
 ---
 * [React native keychain](https://github.com/oblador/react-native-keychain)
