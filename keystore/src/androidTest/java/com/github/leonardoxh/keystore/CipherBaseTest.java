@@ -57,5 +57,14 @@ abstract class CipherBaseTest {
         assertThat(subject.decrypt(ALIAS_FOR_TEST)).isEqualTo(valueToStore);
     }
 
+    @Test
+    public void encryptReplaceKeyCorrectly() {
+        subject.encrypt(ALIAS_FOR_TEST, "test");
+        assertThat(subject.decrypt(ALIAS_FOR_TEST)).isEqualTo("test");
+
+        subject.encrypt(ALIAS_FOR_TEST, "test-replaced");
+        assertThat(subject.decrypt(ALIAS_FOR_TEST)).isEqualTo("test-replaced");
+    }
+
     abstract CipherStorage init();
 }

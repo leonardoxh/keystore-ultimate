@@ -63,12 +63,11 @@ abstract class BaseCipherStorage implements CipherStorage {
 
     /**
      * {@inheritDoc}
+     *
+     * @deprecated use {@link #encrypt(String, String)} instead
      */
     @Override
     public void saveOrReplace(String alias, String value) {
-        if (containsAlias(alias)) {
-            removeKey(alias);
-        }
         encrypt(alias, value);
     }
 

@@ -64,6 +64,8 @@ public interface CipherStorage {
      *
      * @param alias the key for the value
      * @param value the value to store
+     *
+     * @deprecated use {@link #encrypt(String, String)} instead
      */
     void saveOrReplace(String alias, String value);
 }

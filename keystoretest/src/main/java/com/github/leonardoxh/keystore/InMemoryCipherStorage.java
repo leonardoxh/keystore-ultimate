@@ -64,6 +64,8 @@ final class InMemoryCipherStorage implements CipherStorage {
 
     /**
      * {@inheritDoc}
+     *
+     * @deprecated use {@link #encrypt(String, String)} instead
      */
     @Override
     public void saveOrReplace(String alias, String value) {
