@@ -50,6 +50,7 @@ Limitations:
 the the value due a limitation on the Android Keystore
 
 Special thanks:
+---
 - [Zularizal](https://github.com/zularizal) for this amazing library logo and sample icons
 
 LICENSE:
