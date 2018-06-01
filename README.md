@@ -1,4 +1,8 @@
-# keystore-ultimate
+# Keystore Ultimate
+<h1 align=center>
+<img src="Logo/horizontal.png" width=55%>
+</h1>
+
 The ultimate solution for keystore manipulation in Android
 
 Tired of deal with Android keystore? A lot of code ever? This library is for you
