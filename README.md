@@ -28,8 +28,8 @@ implementation 'com.github.leonardoxh:keystore-ultimate:1.2.1'
 ---
 * I care a lot about unit tests, and since this library touch on the Android Keystore
 making it almost impossible to test, but, I said "almost" that's why I provide another library
-just for tests, if you wanna use mockito `when...then` it's fine but I think this is not 
-your responsability so just add this into your test implementation and that's it, the 
+just for tests, if you wanna use mockito `when...then` it's fine but I think this is not
+your responsability so just add this into your test implementation and that's it, the
 `CipherStorageFactory` will return a in memory implementation just for tests you don't need change
 anything on your source code:
 ```groovy
@@ -48,6 +48,9 @@ Limitations:
 ---
 * On Api level 22 and bellow your alias for key should not contain more than 256 bytes otherwise we can't save
 the the value due a limitation on the Android Keystore
+
+Special thanks:
+- [Zularizal](https://github.com/zularizal) for this amazing library logo and sample icons
 
 LICENSE:
 ---
