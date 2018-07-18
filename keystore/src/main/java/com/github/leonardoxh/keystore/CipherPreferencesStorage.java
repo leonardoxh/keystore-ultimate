@@ -21,7 +21,7 @@ import android.util.Base64;
 import javax.annotation.Nullable;
 
 final class CipherPreferencesStorage {
-    private static final String SHARED_PREFERENCES_NAME = CipherPreferencesStorage.class.getName() + "_security_storage";
+    private static final String SHARED_PREFERENCES_NAME = CipherPreferencesStorage.class.getSimpleName() + "_security_storage";
 
     private CipherPreferencesStorage() {
         throw new AssertionError();
