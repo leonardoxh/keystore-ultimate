@@ -20,6 +20,8 @@ import android.content.Context;
 import android.os.Build;
 import android.security.KeyPairGeneratorSpec;
 
+import com.github.leonardoxh.keystore.store.Storage;
+
 import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.security.InvalidAlgorithmParameterException;
@@ -58,8 +60,8 @@ final class CipherStorageSharedPreferencesKeystore extends BaseCipherStorage {
     private static final String AES_TAG_PREFIX = "aes!";
     private static final BigInteger KEY_SERIAL_NUMBER = BigInteger.valueOf(1338);
 
-    CipherStorageSharedPreferencesKeystore(Context context) {
-        super(context);
+    CipherStorageSharedPreferencesKeystore(Context context, Storage storage) {
+        super(context, storage);
     }
 
     /**
@@ -75,7 +77,7 @@ final class CipherStorageSharedPreferencesKeystore extends BaseCipherStorage {
         KeyStore.PrivateKeyEntry key = (KeyStore.PrivateKeyEntry) entry;
         byte[] encryptedData = encryptData(alias, value, key.getCertificate().getPublicKey());
 
-        CipherPreferencesStorage.saveKeyBytes(context, alias, encryptedData);
+        storage.saveKeyBytes(alias, encryptedData);
     }
 
     /**
@@ -98,7 +100,7 @@ final class CipherStorageSharedPreferencesKeystore extends BaseCipherStorage {
     @Override
     public boolean containsAlias(String alias) {
         return super.containsAlias(alias)
-                && CipherPreferencesStorage.containsAlias(context, makeAesTagForAlias(alias));
+                && storage.containsAlias(makeAesTagForAlias(alias));
     }
 
     /**
@@ -107,13 +109,13 @@ final class CipherStorageSharedPreferencesKeystore extends BaseCipherStorage {
     @Override
     public void removeKey(String alias) {
         super.removeKey(alias);
-        CipherPreferencesStorage.remove(context, makeAesTagForAlias(alias));
+        storage.remove(makeAesTagForAlias(alias));
     }
 
     @Nullable
     private String decryptData(String alias, PrivateKey privateKey) {
-        byte[] encryptedData = CipherPreferencesStorage.getKeyBytes(context, alias);
-        byte[] secretData = CipherPreferencesStorage.getKeyBytes(context, makeAesTagForAlias(alias));
+        byte[] encryptedData = storage.getKeyBytes(alias);
+        byte[] secretData = storage.getKeyBytes(makeAesTagForAlias(alias));
         if (encryptedData == null || secretData == null) {
             return null;
         }
@@ -169,8 +171,7 @@ final class CipherStorageSharedPreferencesKeystore extends BaseCipherStorage {
     private byte[] encryptData(String alias, String value, PublicKey publicKey) {
         SecretKey secret = generateKeyAes(alias);
         byte[] rsaEncrypted = cipherEncryption(TRANSFORMATION, Cipher.PUBLIC_KEY, publicKey, secret.getEncoded());
-        CipherPreferencesStorage.saveKeyBytes(context,
-                makeAesTagForAlias(alias), rsaEncrypted);
+        storage.saveKeyBytes(makeAesTagForAlias(alias), rsaEncrypted);
         return cipherEncryption(KEY_ALGORITHM_AES, Cipher.ENCRYPT_MODE, secret, value.getBytes(DEFAULT_CHARSET));
     }
 

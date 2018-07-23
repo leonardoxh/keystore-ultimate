@@ -17,6 +17,8 @@ package com.github.leonardoxh.keystore;
 
 import android.content.Context;
 
+import com.github.leonardoxh.keystore.store.Storage;
+
 import javax.annotation.Nullable;
 
 /**
@@ -36,5 +38,13 @@ public final class CipherStorageFactory {
      */
     public static CipherStorage newInstance(@Nullable Context context) {
         return InMemoryCipherStorage.INSTANCE;
+    }
+
+    /**
+     * Dummy factory
+     * @see #newInstance(Context)
+     */
+    public static CipherStorage newInstance(@Nullable Context context, Storage storage) {
+        return newInstance(context);
     }
 }
