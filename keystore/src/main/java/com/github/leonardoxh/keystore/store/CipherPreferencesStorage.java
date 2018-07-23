@@ -22,22 +22,29 @@ import javax.annotation.Nullable;
 
 public final class CipherPreferencesStorage implements Storage {
     private static final String SHARED_PREFERENCES_NAME = CipherPreferencesStorage.class.getName() + "_security_storage";
-    private final Context context;
 
-    public CipherPreferencesStorage(Context context) {
+    private final Context context;
+    private final String preferenceName;
+
+    public CipherPreferencesStorage(Context context, String preferenceName) {
         this.context = context;
+        this.preferenceName = preferenceName;
     }
 
-    private static void saveKeyString(Context context, String alias, String value) {
-        context.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE)
+    public CipherPreferencesStorage(Context context) {
+        this(context, SHARED_PREFERENCES_NAME);
+    }
+
+    private void saveKeyString(String alias, String value) {
+        context.getSharedPreferences(preferenceName, Context.MODE_PRIVATE)
                 .edit()
                 .putString(alias, value)
                 .apply();
     }
 
     @Nullable
-    private static String getKeyString(Context context, String alias) {
-        return context.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE)
+    private String getKeyString(String alias) {
+        return context.getSharedPreferences(preferenceName, Context.MODE_PRIVATE)
                 .getString(alias, null);
     }
 
@@ -46,7 +53,7 @@ public final class CipherPreferencesStorage implements Storage {
      */
     @Override
     public void remove(String alias) {
-        context.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE)
+        context.getSharedPreferences(preferenceName, Context.MODE_PRIVATE)
                 .edit()
                 .remove(alias)
                 .apply();
@@ -57,7 +64,7 @@ public final class CipherPreferencesStorage implements Storage {
      */
     @Override
     public boolean containsAlias(String alias) {
-        return context.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE)
+        return context.getSharedPreferences(preferenceName, Context.MODE_PRIVATE)
                 .contains(alias);
     }
 
@@ -67,7 +74,7 @@ public final class CipherPreferencesStorage implements Storage {
     @Nullable
     @Override
     public byte[] getKeyBytes(String alias) {
-        String value = getKeyString(context, alias);
+        String value = getKeyString(alias);
         if (value != null) {
             return Base64.decode(value, Base64.DEFAULT);
         }
@@ -79,6 +86,6 @@ public final class CipherPreferencesStorage implements Storage {
      */
     @Override
     public void saveKeyBytes(String alias, byte[] value) {
-        saveKeyString(context, alias, Base64.encodeToString(value, Base64.DEFAULT));
+        saveKeyString(alias, Base64.encodeToString(value, Base64.DEFAULT));
     }
 }
