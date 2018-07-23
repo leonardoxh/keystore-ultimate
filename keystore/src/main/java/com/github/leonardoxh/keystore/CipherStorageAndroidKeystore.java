@@ -21,6 +21,8 @@ import android.os.Build;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
 
+import com.github.leonardoxh.keystore.store.Storage;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -55,8 +57,8 @@ final class CipherStorageAndroidKeystore extends BaseCipherStorage {
     private static final int ENCRYPTION_KEY_SIZE = 256;
     private static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
 
-    CipherStorageAndroidKeystore(Context context) {
-        super(context);
+    CipherStorageAndroidKeystore(Context context, Storage storage) {
+        super(context, storage);
     }
 
     /**
@@ -73,7 +75,7 @@ final class CipherStorageAndroidKeystore extends BaseCipherStorage {
 
             Key key = keyStore.getKey(alias, null);
             byte[] encryptedData = encryptString(key, value);
-            CipherPreferencesStorage.saveKeyBytes(context, alias, encryptedData);
+            storage.saveKeyBytes(alias, encryptedData);
         } catch (NoSuchAlgorithmException | InvalidAlgorithmParameterException |
                 NoSuchProviderException | UnrecoverableKeyException e) {
             throw new CryptoFailedException("Could not encrypt data", e);
@@ -89,7 +91,7 @@ final class CipherStorageAndroidKeystore extends BaseCipherStorage {
     @Override
     public String decrypt(String alias) {
         try {
-            byte[] storedData = CipherPreferencesStorage.getKeyBytes(context, alias);
+            byte[] storedData = storage.getKeyBytes(alias);
             if (storedData == null) {
                 return null;
             }

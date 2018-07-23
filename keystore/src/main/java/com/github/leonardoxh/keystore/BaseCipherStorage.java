@@ -17,6 +17,8 @@ package com.github.leonardoxh.keystore;
 
 import android.content.Context;
 
+import com.github.leonardoxh.keystore.store.Storage;
+
 import java.io.IOException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -26,9 +28,11 @@ import java.security.cert.CertificateException;
 abstract class BaseCipherStorage implements CipherStorage {
     static final String ANDROID_KEY_STORE = "AndroidKeyStore";
     final Context context;
+    final Storage storage;
 
-    BaseCipherStorage(Context context) {
+    BaseCipherStorage(Context context, Storage storage) {
         this.context = context;
+        this.storage = storage;
     }
 
     /**
@@ -39,7 +43,7 @@ abstract class BaseCipherStorage implements CipherStorage {
         try {
             KeyStore keyStore = getKeyStoreAndLoad();
             return keyStore.containsAlias(alias) &&
-                    CipherPreferencesStorage.containsAlias(context, alias);
+                    storage.containsAlias(alias);
         } catch (KeyStoreException e) {
             throw new KeyStoreAccessException("Failed to access Keystore", e);
         }
@@ -54,7 +58,7 @@ abstract class BaseCipherStorage implements CipherStorage {
             if (containsAlias(alias)) {
                 KeyStore keyStore = getKeyStoreAndLoad();
                 keyStore.deleteEntry(alias);
-                CipherPreferencesStorage.remove(context, alias);
+                storage.remove(alias);
             }
         } catch (KeyStoreException e) {
             throw new KeyStoreAccessException("Failed to access Keystore", e);
