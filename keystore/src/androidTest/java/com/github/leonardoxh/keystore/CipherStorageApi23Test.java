@@ -20,6 +20,8 @@ import android.support.annotation.RequiresApi;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
+import com.github.leonardoxh.keystore.store.CipherPreferencesStorage;
+
 import org.junit.runner.RunWith;
 
 @RunWith(AndroidJUnit4.class)
@@ -27,6 +29,7 @@ import org.junit.runner.RunWith;
 public class CipherStorageApi23Test extends CipherBaseTest {
     @Override
     CipherStorage init() {
-        return new CipherStorageAndroidKeystore(InstrumentationRegistry.getContext());
+        return new CipherStorageAndroidKeystore(InstrumentationRegistry.getContext(),
+                new CipherPreferencesStorage(InstrumentationRegistry.getContext()));
     }
 }
