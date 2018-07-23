@@ -2,7 +2,7 @@
 
 # Keystore Ultimate
 <h1 align=center>
-<img src="Logo/horizontal.png" width=55%>
+<img src="assets/horizontal.png" width=55%>
 </h1>
 
 The ultimate solution for keystore manipulation in Android
@@ -23,7 +23,7 @@ CipherStorage cipherStorage = CipherStorageFactory.newInstance(context);
 Gradle dependency:
 ---
 ```groovy
-implementation 'com.github.leonardoxh:keystore-ultimate:1.2.1'
+implementation 'com.github.leonardoxh:keystore-ultimate:1.3.0'
 ```
 
 ...Unit tests?
@@ -35,8 +35,13 @@ your responsability so just add this into your test implementation and that's it
 `CipherStorageFactory` will return a in memory implementation just for tests you don't need change
 anything on your source code:
 ```groovy
-testImplementation 'com.github.leonardoxh:keystore-ultimate-test:1.2.1'
+testImplementation 'com.github.leonardoxh:keystore-ultimate-test:1.3.0'
 ```
+
+Where the encrypted values are stored?
+---
+* By default the encrypted values are stored in an android shared preferences, but you can always
+pass your own implementation of the `Storage` interface and store it where you want, on a SQLite for example.
 
 Library usage?
 ---
