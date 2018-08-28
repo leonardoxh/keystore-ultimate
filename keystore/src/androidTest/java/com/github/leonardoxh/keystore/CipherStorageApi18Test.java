@@ -23,7 +23,7 @@ import com.github.leonardoxh.keystore.store.CipherPreferencesStorage;
 import org.junit.runner.RunWith;
 
 @RunWith(AndroidJUnit4.class)
-public class CipherStorageApi22Test extends CipherBaseTest {
+public class CipherStorageApi18Test extends CipherBaseTest {
     @Override
     CipherStorage init() {
         return new CipherStorageSharedPreferencesKeystore(InstrumentationRegistry.getContext(),
