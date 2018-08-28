@@ -34,10 +34,10 @@ public final class CipherStorageFactory {
 
     /**
      * Create a new instance of the {@link CipherStorage} based on the
-     * current api level, on API 22 and bellow it will use the {@link CipherStorageAndroidKeystore}
+     * current api level, on API 18 and bellow it will use the {@link CipherStorageAndroidKeystore}
      * and on api 23 and above it will use the {@link CipherStorageSharedPreferencesKeystore}
      *
-     * @param context used for api 22 and bellow to access the keystore and
+     * @param context used for api 18 and bellow to access the keystore and
      *                access the Android Shared preferences, on api 23 and above
      *                it's only used for Android Shared Preferences access
      *

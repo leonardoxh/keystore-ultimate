@@ -50,7 +50,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import javax.security.auth.x500.X500Principal;
 
-@TargetApi(Build.VERSION_CODES.LOLLIPOP_MR1)
+@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 final class CipherStorageSharedPreferencesKeystore extends BaseCipherStorage {
     private static final String KEY_ALGORITHM_RSA = "RSA";
     private static final String KEY_ALGORITHM_AES = "AES";
